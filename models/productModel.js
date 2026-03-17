@@ -9,5 +9,5 @@ const productSchema = new mongoose.Schema({
     vendorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     createdAt: { type: Date, default: Date.now }
 });
-// test
+
 module.exports = mongoose.model('Product', productSchema);
