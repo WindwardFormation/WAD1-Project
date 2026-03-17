@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <a href="/products" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">&larr; Continue Shopping</a>
+        <h1 class="text-3xl font-bold mb-8">Your Cart</h1>
+        <% if (cartItems.length === 0) { %>
+            <p class="text-gray-600 text-center">Your cart is empty.</p>
+        <% } else { %>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <ul class="space-y-4">
+                    <% cartItems.forEach(item => { %>
+                        <li class="flex items-center justify-between border-b pb-4">
+                            <div>
+                                <h2 class="text-xl font-semibold"><%= item.productId.name %></h2>
+                                <p class="text-gray-600">Price: $<%= item.productId.price %></p>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <form action="/cart/update/<%= item._id %>" method="POST" class="flex items-center space-x-2">
+                                    <label class="text-sm font-medium text-gray-700">Qty:</label>
+                                    <input type="number" name="quantity" value="<%= item.quantity %>" min="1" class="w-16 px-2 py-1 border border-gray-300 rounded">
+                                    <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Update</button>
+                                </form>
+                                <form action="/cart/remove/<%= item._id %>" method="POST">
+                                    <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Remove</button>
+                                </form>
+                            </div>
+                        </li>
+                    <% }); %>
+                </ul>
+                <div class="mt-6">
+                    <form action="/orders/place" method="POST">
+                        <button type="submit" class="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Place Order</button>
+                    </form>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>

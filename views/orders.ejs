@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Orders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <a href="/products" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">&larr; Back to Products</a>
+        <h1 class="text-3xl font-bold mb-8">Your Orders</h1>
+        <% orders.forEach(order => { %>
+            <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                <h2 class="text-xl font-semibold mb-2">Order ID: <%= order._id %></h2>
+                <p class="text-lg font-bold text-green-600 mb-2">Total: $<%= order.totalPrice %></p>
+                <p class="text-gray-600 mb-2">Status: <span class="<%= order.status === 'Completed' ? 'text-green-600' : order.status === 'Pending' ? 'text-yellow-600' : 'text-red-600' %> font-medium"><%= order.status %></span></p>
+                <p class="text-gray-600 mb-4">Date: <%= order.orderDate %></p>
+                <h3 class="text-lg font-medium mb-2">Items:</h3>
+                <ul class="list-disc list-inside space-y-1 mb-4">
+                    <% order.items.forEach(item => { %>
+                        <li class="text-gray-700"><%= item.productId.name %> - Quantity: <%= item.quantity %> - Price: $<%= item.price %></li>
+                    <% }); %>
+                </ul>
+                <% if (order.status === 'Pending') { %>
+                    <form action="/orders/cancel/<%= order._id %>" method="POST">
+                        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Cancel Order</button>
+                    </form>
+                <% } %>
+            </div>
+        <% }); %>
+    </div>
+</body>
+</html>
