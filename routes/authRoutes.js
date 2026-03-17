@@ -38,6 +38,8 @@ router.get('/login', (req, res) => {
     res.render('login', { error: null });
 });
 
+//test
+
 // POST /login
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
