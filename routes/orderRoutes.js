@@ -10,7 +10,6 @@ function requireAuth(req, res, next) {
     if (req.session.userId) return next();
     res.redirect('/login');
 }
-// test
 // CREATE Orders
 
 // POST /orders/place
