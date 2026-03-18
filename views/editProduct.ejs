@@ -8,12 +8,12 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
     <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <a href="/products/vendor/dashboard" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">&larr; Back to Dashboard</a>
+        <a href="/vendor/dashboard" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">&larr; Back to Dashboard</a>
         <h1 class="text-2xl font-bold mb-6 text-center">Edit Product</h1>
         <% if (error) { %>
             <p class="text-red-500 mb-4 text-center"><%= error %></p>
         <% } %>
-        <form action="/products/vendor/edit/<%= product._id %>" method="POST" class="space-y-4">
+        <form action="/vendor/edit/<%= product._id %>" method="POST" class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700">Name:</label>
                 <input type="text" name="name" value="<%= product.name %>" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">

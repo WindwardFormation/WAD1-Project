@@ -39,6 +39,7 @@ const reviewRoutes = require('./routes/reviewRoutes');
 
 server.use('/', authRoutes);
 server.use('/products', productRoutes);
+server.use('/vendor', productRoutes);
 server.use('/cart', cartRoutes);
 server.use('/orders', orderRoutes);
 server.use('/reviews', reviewRoutes);
