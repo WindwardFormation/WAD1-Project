@@ -46,7 +46,11 @@ router.post('/login', async (req, res) => {
         if (user && await bcrypt.compare(password, user.passwordHash)) {
             req.session.userId = user._id;
             req.session.role = user.role;
-            res.redirect('/products');
+            if (user.role === 'vendor') {
+                res.redirect('/vendor/dashboard');
+            } else {
+                res.redirect('/products');
+            }
         } else {
             res.render('login', { error: 'Invalid credentials' });
         }
