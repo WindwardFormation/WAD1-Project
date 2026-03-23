@@ -1,6 +1,7 @@
 const express = require('express');
 const Product = require('../models/productModel');
 const Review = require('../models/reviewModel');
+const Order = require('../models/orderModel');
 
 const router = express.Router();
 
@@ -107,11 +108,70 @@ router.post('/delete/:id', requireAuth, requireVendor, async (req, res) => {
     res.redirect('/vendor/dashboard');
 });
 
-// GET /products/:id
+// // GET /products/:id
+// router.get('/:id', async (req, res) => {
+//     const product = await Product.findById(req.params.id).populate('vendorId', 'username');
+//     const reviews = await Review.find({ productId: req.params.id }).populate('userId', 'username');
+//     res.render('productDetails', { product, reviews, session: req.session });
+// });
+
+// GET /products/:id UPDATED
 router.get('/:id', async (req, res) => {
-    const product = await Product.findById(req.params.id).populate('vendorId', 'username');
-    const reviews = await Review.find({ productId: req.params.id }).populate('userId', 'username');
-    res.render('productDetails', { product, reviews, session: req.session });
+    try {
+        const product = await Product.findById(req.params.id).populate('vendorId', 'username');
+        const reviews = await Review.findReviewsByProductId(req.params.id); 
+
+        reviews.forEach(review => {
+            const date = new Date(review.createdAt);
+            const day = date.getDate();
+            const year = date.getFullYear();
+            const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            const month = months[date.getMonth()];
+
+            review.formatDate = day + " " + month + " " + year;
+
+        })
+
+        let canReview = false;
+
+        if (req.session.userId) {
+            // All completed orders of this user containing this product
+            const completedOrders = await Order.findCompletedOrdersByUserAndProduct(
+                req.session.userId,
+                req.params.id
+            );
+
+            // All reviews this user has already written for this product
+            const existingReviews = await Review.findReviewsByUserAndProduct(
+                req.session.userId,
+                req.params.id
+            );
+
+            // Orders already used for reviews
+            const reviewedOrderIds = existingReviews.map(review => review.orderId.toString());
+
+            // Find one completed order not yet used for review
+            const availableOrder = completedOrders.find(order =>
+                !reviewedOrderIds.includes(order._id.toString())
+            );
+
+            canReview = !!availableOrder;
+        }
+
+        const message = req.query.message;
+
+        res.render('productDetails', {
+            product,
+            reviews,
+            session: req.session,
+            canReview,
+            message
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
 });
 
 
