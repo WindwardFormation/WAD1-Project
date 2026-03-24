@@ -43,4 +43,10 @@ router.post('/remove/:id', requireAuth, async (req, res) => {
     res.redirect('/cart');
 });
 
+// Clear Cart without Order
+router.post('/remove-all', requireAuth, async (req, res) => {
+    await Cart.deleteMany( { userId : req.session.userId })
+    res.redirect('/cart');
+});
+
 module.exports = router;
