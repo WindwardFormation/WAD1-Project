@@ -1,5 +1,6 @@
 const productModel = require('../models/productModel');
 const Review = require('../models/reviewModel');
+const Order = require('../models/orderModel');
 
 // GET /products
 exports.getAllProducts = async (req, res) => {
@@ -260,13 +261,29 @@ exports.deleteProduct = async (req, res) => {
 exports.getProductDetails = async (req, res) => {
     try {
         const product = await productModel.getProductByIdWithVendor(req.params.id);
-        const reviews = await Review.find({ productId: req.params.id }).populate('userId', 'username');
+        if (!product) {
+            return res.status(404).send('Product not found');
+        }
+
+        const reviews = await Review.getReviewsByProductId(req.params.id);
+
+        let canReview = false;
+        if (req.session.userId) {
+            const completedOrders = await Order.getCompletedOrdersByUserAndProduct(req.session.userId, req.params.id);
+            canReview = completedOrders.length > 0;
+        }
+
+        const message = req.query.message || null;
+
         res.render('productDetails', {
             product,
             reviews,
-            session: req.session
+            session: req.session,
+            canReview,
+            message
         });
     } catch (error) {
+        console.log(error)
         res.send('Failed to load product details');
     }
 }

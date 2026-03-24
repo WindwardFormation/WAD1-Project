@@ -6,22 +6,29 @@ exports.getReviewPage = async (req, res) => {
     try {
         const tab = req.query.tab || 'toreview';
 
-        const orders = await Order.findOrdersByUserId(req.session.userId);
-        const reviews = await Review.findReviewsByUser(req.session.userId);
+        const orders = await Order.getOrdersByUserId(req.session.userId);
+        const reviews = await Review.getReviewsByUser(req.session.userId);
 
         const toReviewItems = [];
         const historyItems = [];
 
         for (const order of orders) {
-            if (order.status !== 'Completed') {
+            if (!order || order.status !== 'Completed') {
                 continue;
             }
 
             for (const item of order.items) {
-                const product = await Product.findById(item.productId._id)
-                    .populate('vendorId', 'username');
+                if (!item || !item.productId) {
+                    continue;
+                }
+                const productId = item.productId._id || item.productId;
+                const product = await Product.getProductByIdWithVendor(productId);
+                if (!product) {
+                    continue;
+                }
 
                 const existingReview = reviews.find(review =>
+                    review && review.orderId && review.productId &&
                     review.orderId.toString() === order._id.toString() &&
                     review.productId.toString() === product._id.toString()
                 );
@@ -54,14 +61,15 @@ exports.getReviewPage = async (req, res) => {
         }
 
         res.render('reviews', {
-            tab: tab,
-            toReviewItems: toReviewItems,
-            historyItems: historyItems
+            tab,
+            toReviewItems,
+            historyItems,
+            session: req.session
         });
 
     } catch (error) {
         console.error(error);
-        res.send('Error loading review page');
+        res.status(500).send('Error loading review page');
     }
 };
 
@@ -74,7 +82,7 @@ exports.addReview = async (req, res) =>  {
         const comment = req.body.comment;
         
         // Find all completed orders by this user that contain this product
-        const completedOrders = await Order.findCompletedOrdersByUserAndProduct(
+        const completedOrders = await Order.getCompletedOrdersByUserAndProduct(
             req.session.userId,
             productId
         );
@@ -85,7 +93,7 @@ exports.addReview = async (req, res) =>  {
         }
 
         // Find all reviews already written by this user for this product
-        const existingReviews = await Review.findReviewsByUserAndProduct(
+        const existingReviews = await Review.getReviewsByUserAndProduct(
             req.session.userId,
             productId
         );
@@ -112,7 +120,7 @@ exports.addReview = async (req, res) =>  {
             comment: comment
         };
 
-        await Review.addReview(review); 
+        await Review.createReview(review); 
         res.redirect(`/products/${productId}?message=created`);
 
     } catch (error) {
@@ -152,7 +160,7 @@ exports.updateReview = async (req, res) => {
 // POST /reviews/delete/:id
 exports.deleteReview = async (req, res) => {
     try {
-        const review = await Review.findReviewByIdAndUser(
+        const review = await Review.getReviewByIdAndUser(
             req.params.id,
             req.session.userId
         );

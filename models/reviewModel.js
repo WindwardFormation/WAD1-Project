@@ -11,45 +11,40 @@ const reviewSchema = new mongoose.Schema({
 
 const Review = mongoose.model('Review', reviewSchema, 'reviews');
 
-//for reviews tab
-exports.findReviewsByUser = function(userId) {
+// Get all reviews by user
+exports.getReviewsByUser = function(userId) {
     return Review.find({userId: userId});
 };
 
-
-
-//find reviews of specific user for a specific product
-//check if user reviewed 
-exports.findReviewsByUserAndProduct = function(userId, productId) {
+// Get reviews by user and product
+exports.getReviewsByUserAndProduct = function(userId, productId) {
     return Review.find({
         userId: userId,
         productId: productId
     });
 };
 
-//check if review belongs to user before update/delete
-exports.findReviewByIdAndUser = function(reviewId, userId) {
+// Get review by ID and user (ownership check)
+exports.getReviewByIdAndUser = function(reviewId, userId) {
     return Review.findOne({
         _id: reviewId,
         userId: userId
     });
 };
 
-//populate the username of reviewer and sort review
-exports.findReviewsByProductId = function(productId) {
+// Get reviews by product ID with user populated and sorted
+exports.getReviewsByProductId = function(productId) {
     return Review.find({ productId: productId })
-    // handles how review is retrieved from db
-        .populate('userId', 'username') 
-        .sort({ createdAt: -1 }); //sort based on newest review
+        .populate('userId', 'username')
+        .sort({ createdAt: -1 });
 };
 
-
-//create
-exports.addReview = function(newReview) {
+// Create review
+exports.createReview = function(newReview) {
     return Review.create(newReview);
 };
 
-//user can only update their own reviews
+// Update review (user ownership validated)
 exports.updateReview = function(reviewId, userId, updatedReview) {
     return Review.findOneAndUpdate(
         { _id: reviewId, userId: userId },
@@ -58,7 +53,7 @@ exports.updateReview = function(reviewId, userId, updatedReview) {
     );
 };
 
-//delete
+// Delete review (user ownership validated)
 exports.deleteReview = function(reviewId, userId) {
     return Review.deleteOne({
         _id: reviewId,

@@ -8,4 +8,18 @@ const userSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+
+User.findByUsername = function (username) {
+    return this.findOne({ username });
+};
+
+User.createUser = function (data) {
+    return this.create(data);
+};
+
+User.updateUserById = function (userId, updates) {
+    return this.findByIdAndUpdate(userId, updates, { new: true });
+};
+
+module.exports = User;

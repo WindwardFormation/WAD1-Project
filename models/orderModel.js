@@ -12,20 +12,30 @@ const orderSchema = new mongoose.Schema({
     orderDate: { type: Date, default: Date.now }
 });
 
-//updated
 const Order = mongoose.model('Order', orderSchema, 'orders');
 
-module.exports = Order;
-
-//find order and product id for reviews
-module.exports.findOrdersByUserId = function(userId) {
-    return Order.find({ userId: userId }).populate('items.productId')
+Order.getOrdersByUserId = function (userId) {
+    return this.find({ userId }).populate('items.productId');
 };
 
-module.exports.findCompletedOrdersByUserAndProduct = function(userId, productId) {
-    return Order.find({
+Order.getCompletedOrdersByUserAndProduct = function(userId, productId) {
+    return this.find({
         userId: userId,
         status: 'Completed',
         'items.productId': productId
     });
 };
+
+Order.createOrder = function(orderData) {
+    return this.create(orderData);
+};
+
+Order.updateOrderStatus = function(orderId, userId, status) {
+    return this.findOneAndUpdate(
+        { _id: orderId, userId },
+        { status },
+        { new: true }
+    );
+};
+
+module.exports = Order;
