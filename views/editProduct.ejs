@@ -6,36 +6,102 @@
     <title>Edit Product</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <a href="/products/vendor/dashboard" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">&larr; Back to Dashboard</a>
-        <h1 class="text-2xl font-bold mb-6 text-center">Edit Product</h1>
-        <% if (error) { %>
-            <p class="text-red-500 mb-4 text-center"><%= error %></p>
-        <% } %>
-        <form action="/products/vendor/edit/<%= product._id %>" method="POST" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Name:</label>
-                <input type="text" name="name" value="<%= product.name %>" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Description:</label>
-                <textarea name="description" rows="3" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"><%= product.description %></textarea>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Price:</label>
-                <input type="number" name="price" step="0.01" value="<%= product.price %>" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Category:</label>
-                <input type="text" name="category" value="<%= product.category %>" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Stock:</label>
-                <input type="number" name="stock" value="<%= product.stock %>" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-            <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Update Product</button>
-        </form>
-    </div>
+
+<div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+
+    <a href="/vendor/dashboard" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">
+        &larr; Back to Dashboard
+    </a>
+
+    <h1 class="text-2xl font-bold mb-6 text-center">Edit Product</h1>
+    <% if (errors && errors.general) { %>
+        <p class="text-red-500 mb-4 text-center"><%= errors.general %></p>
+    <% } %>
+
+    <form action="/vendor/edit/<%= product._id %>" method="POST" class="space-y-4">
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Name:</label>
+            <input 
+                type="text" 
+                name="name"
+                value="<%= old?.name || product.name %>"
+                class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none
+                <%= errors?.name ? 'border-red-500' : 'border-gray-300' %>">
+            
+            <% if (errors?.name) { %>
+                <p class="text-red-500 text-sm mt-1"><%= errors.name %></p>
+            <% } %>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Description:</label>
+            <textarea 
+                name="description" 
+                rows="3"
+                class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none
+                <%= errors?.description ? 'border-red-500' : 'border-gray-300' %>"><%= old?.description || product.description %></textarea>
+            
+            <% if (errors?.description) { %>
+                <p class="text-red-500 text-sm mt-1"><%= errors.description %></p>
+            <% } %>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Price:</label>
+            <input 
+                type="text" 
+                name="price"
+                value="<%= old?.price || product.price %>"
+                class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none
+                <%= errors?.price ? 'border-red-500' : 'border-gray-300' %>">
+            
+            <% if (errors?.price) { %>
+                <p class="text-red-500 text-sm mt-1"><%= errors.price %></p>
+            <% } %>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Category:</label>
+            <select 
+                name="category"
+                class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none
+                <%= errors?.category ? 'border-red-500' : 'border-gray-300' %>">
+
+                <option value="">-- Select Category --</option>
+
+                <option value="Electronics" <%= (old?.category || product.category) === 'Electronics' ? 'selected' : '' %>>Electronics</option>
+                <option value="Fashion" <%= (old?.category || product.category) === 'Fashion' ? 'selected' : '' %>>Fashion</option>
+                <option value="Home & Living" <%= (old?.category || product.category) === 'Home & Living' ? 'selected' : '' %>>Home & Living</option>
+                <option value="Books" <%= (old?.category || product.category) === 'Books' ? 'selected' : '' %>>Books</option>
+
+            </select>
+
+            <% if (errors?.category) { %>
+                <p class="text-red-500 text-sm mt-1"><%= errors.category %></p>
+            <% } %>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Stock:</label>
+            <input 
+                type="text" 
+                name="stock"
+                value="<%= old?.stock || product.stock %>"
+                class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none
+                <%= errors?.stock ? 'border-red-500' : 'border-gray-300' %>">
+            
+            <% if (errors?.stock) { %>
+                <p class="text-red-500 text-sm mt-1"><%= errors.stock %></p>
+            <% } %>
+        </div>
+        <button 
+            type="submit"
+            class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none">
+            Update Product
+        </button>
+
+    </form>
+</div>
+
 </body>
 </html>

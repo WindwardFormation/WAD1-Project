@@ -36,12 +36,15 @@ const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const wishlistRoutes = require('./routes/wishlistRoutes');
 
 server.use('/', authRoutes);
 server.use('/products', productRoutes);
+server.use('/vendor', productRoutes);
 server.use('/cart', cartRoutes);
 server.use('/orders', orderRoutes);
 server.use('/reviews', reviewRoutes);
+server.use('/wishlist', wishlistRoutes);
 
 // Home route
 server.get('/', (req, res) => {

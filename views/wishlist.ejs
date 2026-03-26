@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Wishlist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-6 text-center">Your Wishlist</h1>
+        <div class="mb-6 flex justify-center space-x-4">
+            <a href="/products" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Back to Products</a>
+            <a href="/cart" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Cart</a>
+            <a href="/orders" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">Orders</a>
+            <form action="/logout" method="POST" class="inline">
+                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
+            </form>
+        </div>
+
+        <% if (wishlistItems.length === 0) { %>
+            <p class="text-center text-gray-600">No items in wishlist yet.</p>
+        <% } else { %>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <% wishlistItems.forEach(item => { %>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold mb-2"><a href="/products/<%= item.productId._id %>" class="text-indigo-600 hover:text-indigo-800"><%= item.productId.name %></a></h2>
+                        <p class="text-gray-600 mb-2"><%= item.productId.description %></p>
+                        <p class="text-lg font-bold text-green-600 mb-2">$<%= item.productId.price %></p>
+                        <p class="text-sm text-gray-500 mb-4">Category: <%= item.productId.category %></p>
+
+                        <form action="/wishlist/remove/<%= item._id %>" method="POST">
+                            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Remove</button>
+                        </form>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>

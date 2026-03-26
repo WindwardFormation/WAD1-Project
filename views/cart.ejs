@@ -10,6 +10,10 @@
     <div class="container mx-auto px-4 py-8">
         <a href="/products" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">&larr; Continue Shopping</a>
         <h1 class="text-3xl font-bold mb-8">Your Cart</h1>
+        <form action="/cart/remove-all" method="post" >
+            <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Clear Cart</button>
+        </form>
+        <br>
         <% if (cartItems.length === 0) { %>
             <p class="text-gray-600 text-center">Your cart is empty.</p>
         <% } else { %>

@@ -1,37 +1,15 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
-const User = require('../models/userModel');
-
 const router = express.Router();
+const authController = require('../controllers/authController');
+const { requireAuth } = require('../middleware/auth-middleware');
 
-// Middleware to check if logged in
-function requireAuth(req, res, next) {
-    if (req.session.userId) {
-        return next();
-    } else {
-        res.redirect('/login');
-    }
-}
+router.get('/register', authController.getRegister);
+router.post('/register', authController.postRegister);
 
-// GET /register
-router.get('/register', (req, res) => {
-    res.render('register', { error: null });
-});
+router.get('/login', authController.getLogin);
+router.post('/login', authController.postLogin);
 
-// POST /register
-router.post('/register', async (req, res) => {
-    const { username, email, password, role } = req.body;
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ username, email, passwordHash: hashedPassword, role: role || 'customer' });
-        await user.save();
-        req.session.userId = user._id;
-        req.session.role = user.role;
-        res.redirect('/products');
-    } catch (err) {
-        res.render('register', { error: 'Registration failed. Username or email may already exist.' });
-    }
-});
+router.post('/logout', authController.postLogout);
 
 // GET /login
 router.get('/login', (req, res) => {
