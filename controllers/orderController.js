@@ -1,49 +1,65 @@
-const Order = require('../models/orderModel');
-const Cart = require('../models/cartModel');
+const Order = require("../models/orderModel");
+const Cart = require("../models/cartModel");
 
+// export to orderRoute
 exports.placeOrder = async (req, res) => {
+    // get user cart
     const cartItems = await Cart.getCartItemsByUserId(req.session.userId);
 
+    // if nothing in cart, redirect to /cart route
     if (!cartItems.length) {
-        return res.redirect('/cart');
+        return res.redirect("/cart");
     }
 
-    const items = cartItems.map(item => ({
+    const items = cartItems.map((item) => ({
+        // only gets the attributes needed
         productId: item.productId._id,
         quantity: item.quantity,
-        price: item.productId.price
+        price: item.productId.price,
     }));
 
-    const totalPrice = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    // loops through items and calculates total price
+    let totalPrice = 0;
+    items.forEach((item) => {
+        totalPrice += item.price * item.quantity;
+    });
 
     await Order.createOrder({
         userId: req.session.userId,
         items,
-        totalPrice
+        totalPrice,
     });
 
     await Cart.clearCart(req.session.userId);
 
-    res.redirect('/orders');
+    res.redirect("/orders");
 };
 
+// get orders page (read)
 exports.getOrdersPage = async (req, res) => {
     const orders = await Order.getOrdersByUserId(req.session.userId);
-    res.render('orders', { orders, session: req.session });
+    res.render("orders", { orders });
 };
 
+// cancel order (update)
 exports.cancelOrder = async (req, res) => {
-    const order = await Order.updateOrderStatus(req.params.id, req.session.userId, 'Cancelled');
-    if (!order) {
-        return res.status(404).send('Order not found or unauthorized');
-    }
-    res.redirect('/orders');
-};
+    try {
+        const order = await Order.updateOrderStatus(req.params.id, "Cancelled");
+    } catch (error) {
+        console.log(error);
+        return res.send(error);
+    } finally {
+        res.redirect('/orders');
+    }};
 
+
+// complete order (update)
 exports.completeOrder = async (req, res) => {
-    const order = await Order.updateOrderStatus(req.params.id, req.session.userId, 'Completed');
-    if (!order) {
-        return res.status(404).send('Order not found or unauthorized');
-    }
-    res.redirect('/orders');
-};
+    try {
+        const order = await Order.updateOrderStatus(req.params.id, "Completed");
+    } catch (error) {
+        console.log(error);
+        return res.send(error);
+    } finally {
+        res.redirect('/orders');
+    }};
