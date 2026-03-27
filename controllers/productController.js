@@ -1,5 +1,6 @@
 const productModel = require('../models/productModel');
 const Review = require('../models/reviewModel');
+const Order = require('../models/orderModel');
 
 // GET /products
 exports.getAllProducts = async (req, res) => {
@@ -260,13 +261,71 @@ exports.deleteProduct = async (req, res) => {
 exports.getProductDetails = async (req, res) => {
     try {
         const product = await productModel.getProductByIdWithVendor(req.params.id);
-        const reviews = await Review.find({ productId: req.params.id }).populate('userId', 'username');
+        if (!product) {
+            return res.status(404).send('Product not found');
+        }
+        const reviews = await Review.getReviewsByProductId(req.params.id);
+
+        let canReview = false;
+
+        if (req.session.userId) {
+            const completedOrders = await Order.getCompletedOrdersByUserAndProduct(req.session.userId, req.params.id);
+            const existingReviews = await Review.getReviewsByUserAndProduct(req.session.userId, req.params.id);
+
+            for (let i = 0; i < completedOrders.length; i++) {
+                let order = completedOrders[i];
+                let alreadyReviewed = false;
+
+                for (let j = 0; j < existingReviews.length; j++) {
+                    let review = existingReviews[j];
+                    if (review.orderId.toString() === order._id.toString()) {
+                        alreadyReviewed = true;
+                    }
+                }
+                // allow review if at least one order is not reviewed
+                if (!alreadyReviewed) {
+                    canReview = true;
+                }
+            }
+        }
+
+        const message = req.query.message || null;
+
         res.render('productDetails', {
             product,
             reviews,
+            canReview, 
+            message,
             session: req.session
         });
     } catch (error) {
         res.send('Failed to load product details');
     }
 }
+
+// GET /vendor/products/:id/reviews
+exports.getVendorProductReviews = async (req, res) => {
+    const productId = req.params.id;
+    try {
+        const product = await productModel.getProductByIdWithVendor(productId);
+
+        if (!product) {
+            return res.status(404).send('Product not found');
+        }
+        if (product.vendorId._id.toString() !== req.session.userId) {
+            return res.status(403).send('Access denied');
+        }
+
+        const reviews = await Review.getReviewsByProductId(productId);
+
+        res.render('vendorProductReviews', {
+            product,
+            reviews,
+            session: req.session
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.send('Failed to load product reviews');
+    }
+};

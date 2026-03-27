@@ -30,7 +30,7 @@
             </form>
             <div class="flex flex-wrap gap-2">
                 <a href="/profile" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Profile</a>
-                <a href="/orders" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">Orders</a>
+                <!-- <a href="/orders" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">Orders</a> -->
                 <a href="/vendor/add" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+ Add</a>
 
                 <form action="/logout" method="POST">
@@ -67,6 +67,14 @@
                     <p class="text-sm text-gray-500 mb-4">
                         Stock: <%= product.stock %>
                     </p>
+                    
+                    <div style="padding-bottom: 20px;">
+                        <a href="/products/vendor/<%= product._id %>/reviews"
+                           class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
+                           View Reviews
+                        </a>
+                    </div>
+   
                     <div class="flex space-x-2">
                         <a href="/vendor/edit/<%= product._id %>"
                            class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
@@ -81,7 +89,6 @@
                             </button>
                         </form>
                     </div>
-
                 </div>
             <% }); %>
         </div>
