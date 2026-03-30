@@ -50,3 +50,10 @@ exports.updateProductById = function(productId, updatedData) {
 exports.deleteProductById = function(productId) {
     return Product.deleteOne({ _id: productId });
 };
+
+// Find the stocks left for a particular item
+exports.findStocks = async function(productId) {
+    const product = await Product.findOne({ _id: productId });
+    const stock = product.stock;
+    return stock;
+};
