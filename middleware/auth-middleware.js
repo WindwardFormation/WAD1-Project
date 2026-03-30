@@ -1,6 +1,8 @@
 function requireAuth(req, res, next) {
-    if (req.session.userId) return next();
-    res.redirect('/login');
+    if (!req.session || !req.session.userId) {
+        return res.redirect('/login');
+    }
+    next();
 }
 
 function requireVendor(req, res, next) {

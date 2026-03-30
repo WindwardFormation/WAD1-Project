@@ -14,12 +14,20 @@ User.findByUsername = function (username) {
     return this.findOne({ username });
 };
 
+User.findByEmail = function (email) {
+    return this.findOne({ email });
+};
+
 User.createUser = function (data) {
     return this.create(data);
 };
 
 User.updateUserById = function (userId, updates) {
     return this.findByIdAndUpdate(userId, updates, { new: true });
+};
+
+User.deleteUserById = function (userId) {
+    return this.findByIdAndDelete(userId);
 };
 
 module.exports = User;
