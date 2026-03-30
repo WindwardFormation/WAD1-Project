@@ -24,11 +24,14 @@
                             <div>
                                 <h2 class="text-xl font-semibold"><%= item.productId.name %></h2>
                                 <p class="text-gray-600">Price: $<%= item.productId.price %></p>
+                                <!-- Added stock count for viewing -->
+                                <p class="text-gray-600">Stock: <%= item.productId.stock %></p>
                             </div>
                             <div class="flex items-center space-x-4">
                                 <form action="/cart/update/<%= item._id %>" method="POST" class="flex items-center space-x-2">
                                     <label class="text-sm font-medium text-gray-700">Qty:</label>
-                                    <input type="number" name="quantity" value="<%= item.quantity %>" min="1" class="w-16 px-2 py-1 border border-gray-300 rounded">
+                                    <!-- Added stock validation -->
+                                    <input type="number" name="quantity" value="<%= item.quantity %>" min="1" max="<%= item.productId.stock %>" class="w-16 px-2 py-1 border border-gray-300 rounded">
                                     <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Update</button>
                                 </form>
                                 <form action="/cart/remove/<%= item._id %>" method="POST">
