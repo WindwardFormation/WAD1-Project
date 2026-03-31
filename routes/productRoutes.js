@@ -10,6 +10,9 @@ router.post('/add', requireAuth, requireVendor, productController.postAddProduct
 router.get('/edit/:id', requireAuth, requireVendor, productController.getEditProduct);
 router.post('/edit/:id', requireAuth, requireVendor, productController.postEditProduct);
 router.post('/delete/:id', requireAuth, requireVendor, productController.deleteProduct);
+
+router.get('/vendor/:id/reviews', requireAuth, requireVendor, productController.getVendorProductReviews);
+
 router.get('/:id', productController.getProductDetails);
 
 module.exports = router;

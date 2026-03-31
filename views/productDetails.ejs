@@ -68,14 +68,27 @@
                 <% } %>
 
 
-                <% if (message === 'notallowed') { %>
+                <% if (message === 'invalid_rating') { %>
+                    <p class="text-red-600 mb-4">Rating must be between 1 and 5.</p>
+                <% } %>
+
+                <% if (message === 'empty_comment') { %>
+                    <p class="text-red-600 mb-4">Comment cannot be empty.</p>
+                <% } %>
+
+                <% if (message === 'not_allowed') { %>
                     <p class="text-red-600 mb-4">You can only review products you have purchased.</p>
                 <% } %>
 
                 <% if (message === 'already_reviewed') { %>
                     <p class="text-red-600 mb-4">You have already reviewed this product.</p>
                 <% } %>
+
+                <% if (message === 'no_changes') { %>
+                    <p class="text-red-600 mb-4">No changes detected.</p>
+                <% } %>
                 
+
                 <% if (!reviews || reviews.length === 0) { %>
                 <p class="text-gray-500">No reviews yet</p>
                 <% } else { %>
@@ -84,22 +97,33 @@
                             <p class="font-semibold"><%= review.userId.username %> - <span class="text-yellow-500"><%= '★'.repeat(review.rating) %></span> (<%= review.rating %>/5)</p>
                             <p class="text-gray-700"><%= review.comment %></p>
                             <br>
-
                             <p class="text-sm text-gray-500">
-                                <%= review.formatDate %>
+                                <%= review.createdAt.toDateString() %>
                             </p>
+                            <br>
                             
                             <% if (session.userId && review.userId._id.toString() === session.userId) { %>
                                 <div class="mt-2 space-x-2">
-                                    <!-- 2 separate POST request -->
+                                    
                                     <form action="/reviews/update/<%= review._id %>" method="POST" class="inline">
-                                        <input type="hidden" name="rating" value="<%= review.rating %>">
+                                        <input type="hidden" name="productId" value="<%= product._id %>">
+                                        <label class="block text-sm font-medium text-gray-700">Rating:</label>
+                                        <select name="rating" class="px-2 py-1 border border-gray-300 rounded">
+                                            <option value="1" <%= review.rating === 1 ? 'selected' : '' %>>1</option>
+                                            <option value="2" <%= review.rating === 2 ? 'selected' : '' %>>2</option>
+                                            <option value="3" <%= review.rating === 3 ? 'selected' : '' %>>3</option>
+                                            <option value="4" <%= review.rating === 4 ? 'selected' : '' %>>4</option>
+                                            <option value="5" <%= review.rating === 5 ? 'selected' : '' %>>5</option>
+                                        </select>
+                                        <br>
+                                        <label class="block text-sm font-medium text-gray-700">Comment:</label>
                                         <textarea name="comment" rows="2" class="px-2 py-1 border border-gray-300 rounded"><%= review.comment %></textarea>
                                         <br>
                                         <button type="submit" onclick="return confirm('Are you sure you want to update this review?')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
                                             Update
                                         </button>
                                     </form>
+                                    
                                     <form action="/reviews/delete/<%= review._id %>" method="POST" class="inline">
                                         <button type="submit" onclick="return confirm('Are you sure you want to delete this review?')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
                                             Delete
