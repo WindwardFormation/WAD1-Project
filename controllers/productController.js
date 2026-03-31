@@ -287,6 +287,7 @@ exports.getProductDetails = async (req, res) => {
                     canReview = true;
                 }
             }
+
         }
 
         const message = req.query.message || null;
@@ -299,6 +300,7 @@ exports.getProductDetails = async (req, res) => {
             session: req.session
         });
     } catch (error) {
+        console.log(error)
         res.send('Failed to load product details');
     }
 }

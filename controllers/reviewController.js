@@ -2,7 +2,6 @@ const Review = require('../models/reviewModel');
 const Order = require('../models/orderModel');
 const Product = require('../models/productModel');
 
-
 // POST /reviews/add
 exports.addReview = async (req, res) =>  {
     const productId = req.body.productId;

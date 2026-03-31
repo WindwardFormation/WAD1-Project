@@ -8,4 +8,22 @@ const wishlistSchema = new mongoose.Schema({
 
 wishlistSchema.index({ userId: 1, productId: 1 }, { unique: true });
 
-module.exports = mongoose.model('Wishlist', wishlistSchema);
+const Wishlist = mongoose.model('Wishlist', wishlistSchema);
+
+Wishlist.getWishlistItemsByUserId = function (userId) {
+    return this.find({ userId }).populate('productId');
+};
+
+Wishlist.addOrUpdateWishlistItem = function (userId, productId) {
+    return this.findOneAndUpdate(
+        { userId, productId },
+        { userId, productId },
+        { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
+    );
+};
+
+Wishlist.removeWishlistItem = function (wishlistId, userId) {
+    return this.findOneAndDelete({ _id: wishlistId, userId });
+};
+
+module.exports = Wishlist;
