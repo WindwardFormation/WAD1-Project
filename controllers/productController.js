@@ -5,10 +5,6 @@ const Order = require('../models/orderModel');
 // GET /products
 exports.getAllProducts = async (req, res) => {
     try {
-        if (req.session.userId && req.session.role === 'vendor') {
-            return res.redirect('/products/dashboard');
-        }
-
         const { category, search } = req.query;
         const query = {};
 
@@ -71,7 +67,7 @@ exports.postAddProduct = async (req, res) => {
     if (!price) {
         errors.price = 'Price is required';
     } else if (!/^\d+(\.\d{1,2})?$/.test(price)) {
-        errors.price = 'Price must be a number with up to 2 decimal places';
+        errors.price = 'Price must be a positive number with up to 2 decimal places';
     }
 
     // category
@@ -159,7 +155,7 @@ exports.postEditProduct = async (req, res) => {
     if (!price) {
         errors.price = 'Price is required';
     } else if (!/^\d+(\.\d{1,2})?$/.test(price)) {
-        errors.price = 'Price must be up to 2 decimal places';
+        errors.price = 'Price must be a positive number with up to 2 decimal places';
     }
 
     // Category
