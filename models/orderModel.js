@@ -18,9 +18,14 @@ const Order = mongoose.model('Order', orderSchema, 'orders');
 
 // functions
 
+// for review
 // find order and product id for reviews
-module.exports.getOrdersByUserId = function(userId) {
-    return Order.find({ userId: userId }).populate('items.productId')
+function getOrdersByUserId(userId) {
+    return Order.find({ userId:userId })
+        .populate({
+            path: 'items.productId',
+            populate: { path: 'vendorId', select: 'username' }
+        });
 };
 
 // for cart 
@@ -30,10 +35,6 @@ function createOrder(orderData) {
     // orderData from cart
 };
 
-// returns all the orders for a particular user 
-function getOrdersByUserId(userId) {
-    return Order.find({ userId:userId }).populate('items.productId')
-};
 
 // update order 
 function updateOrderStatus(orderId, status) {

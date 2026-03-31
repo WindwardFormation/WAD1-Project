@@ -147,15 +147,6 @@ exports.deleteReview = async (req, res) => {
 // reviews tab
 exports.getReviewPage = async (req, res) => {
     const tab = req.query.tab || 'toreview';
-    // check if theres a review for this order and this product
-    function getMatchingReview(orderId, productId, reviews) {
-        for (let i = 0; i < reviews.length; i++) {
-            if (reviews[i].orderId.toString() === orderId.toString() && reviews[i].productId.toString() === productId.toString()) {
-                return reviews[i];
-            }
-        }
-        return null;
-        }
         
     try {
         const orders = await Order.getOrdersByUserId(req.session.userId);
@@ -164,41 +155,55 @@ exports.getReviewPage = async (req, res) => {
         const toReviewItems = [];
         const historyItems = [];
 
+        const reviewLookup = {};
+
+        for (let i = 0; i < reviews.length; i++) {
+            const review = reviews[i];
+            const key = review.orderId.toString() + '_' + review.productId.toString();
+            reviewLookup[key] = review;
+        }
+
         for (let i = 0; i < orders.length; i++) {
             const order = orders[i];
 
-            if (order && order.status === 'Completed') {
-                for (let j = 0; j < order.items.length; j++) {
-                    const item = order.items[j];
+            if (!order || order.status !== 'Completed') {
+                continue;
+            }
 
-                    if (item && item.productId) {
-                        const productId = item.productId._id || item.productId;
-                        const product = await Product.getProductByIdWithVendor(productId);
+            for (let j = 0; j < order.items.length; j++) {
+                const item = order.items[j];
 
-                        if (product) {
-                            const existingReview = getMatchingReview(order._id, product._id, reviews);
+                if (!item || !item.productId) {
+                    continue;
+                }
 
-                            if (existingReview) {
-                                historyItems.push({
-                                    productId: product._id,
-                                    vendorName: product.vendorId.username,
-                                    productName: product.name,
-                                    rating: existingReview.rating,
-                                    comment: existingReview.comment,
-                                    createdAt: existingReview.createdAt
-                                });
-                            } else {
-                                toReviewItems.push({
-                                    orderId: order._id,
-                                    productId: product._id,
-                                    vendorName: product.vendorId.username,
-                                    productName: product.name,
-                                    quantity: item.quantity,
-                                    price: item.price
-                                });
-                            }
-                        }
-                    }
+                const product = item.productId;
+
+                if (!product || !product.vendorId) {
+                    continue;
+                }
+
+                const key = order._id.toString() + '_' + product._id.toString();
+                const existingReview = reviewLookup[key];
+
+                if (existingReview) {
+                    historyItems.push({
+                        productId: product._id,
+                        vendorName: product.vendorId.username,
+                        productName: product.name,
+                        rating: existingReview.rating,
+                        comment: existingReview.comment,
+                        createdAt: existingReview.createdAt
+                    });
+                } else {
+                    toReviewItems.push({
+                        orderId: order._id,
+                        productId: product._id,
+                        vendorName: product.vendorId.username,
+                        productName: product.name,
+                        quantity: item.quantity,
+                        price: item.price
+                    });
                 }
             }
         }
