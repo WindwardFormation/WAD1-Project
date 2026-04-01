@@ -57,3 +57,19 @@ exports.findStocks = async function(productId) {
     const stock = product.stock;
     return stock;
 };
+
+// Reduce stock after order is placed
+exports.reduceStock = function(productId, quantity) {
+    return Product.updateOne(
+        { _id: productId, stock: { $gte: quantity } },
+        { $inc: { stock: -quantity } }
+    );
+};
+
+// Add stock back after order is cancelled
+exports.restoreStock = function(productId, quantity) {
+    return Product.updateOne(
+        { _id: productId },
+        { $inc: { stock: quantity } }
+    );
+};
