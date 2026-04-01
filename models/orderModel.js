@@ -2,13 +2,11 @@ const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    // list of items 
     items: [{
         productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
         quantity: { type: Number, required: true, min: 1 },
         price: { type: Number, required: true, min: 0 }
     }],
-    // total price of all items in the list 
     totalPrice: { type: Number, required: true, min: 0 },
     status: { type: String, enum: ['Pending', 'Completed', 'Cancelled'], default: 'Pending' },
     orderDate: { type: Date, default: Date.now }
@@ -28,13 +26,16 @@ function getOrdersByUserId(userId) {
         });
 };
 
-// for cart 
+// find order by orderId 
+function getOrderByOrderId(orderId) {
+    return Order.findOne({ _id:orderId });
+};
+
 // create new order 
 function createOrder(orderData) {
     return Order.create(orderData)
     // orderData from cart
 };
-
 
 // update order 
 function updateOrderStatus(orderId, status) {
@@ -65,7 +66,8 @@ function getCompletedOrdersByUserAndProduct(userId, productId) {
 
 module.exports = {
     createOrder, 
-    getOrdersByUserId, 
+    getOrdersByUserId,
+    getOrderByOrderId, 
     updateOrderStatus, 
     getCompletedOrdersByUserAndProduct
 };

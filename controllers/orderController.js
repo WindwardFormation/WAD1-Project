@@ -1,5 +1,6 @@
 const Order = require("../models/orderModel");
 const Cart = require("../models/cartModel");
+const Product = require("../models/productModel");
 
 // export to orderRoute
 exports.placeOrder = async (req, res) => {
@@ -20,8 +21,9 @@ exports.placeOrder = async (req, res) => {
 
     // loops through items and calculates total price
     let totalPrice = 0;
-    items.forEach((item) => {
+    items.forEach(async (item) => {
         totalPrice += item.price * item.quantity;
+        await Product.reduceStock(item.productId, item.quantity);
     });
 
     await Order.createOrder({
@@ -44,7 +46,12 @@ exports.getOrdersPage = async (req, res) => {
 // cancel order (update)
 exports.cancelOrder = async (req, res) => {
     try {
-        const order = await Order.updateOrderStatus(req.params.id, "Cancelled");
+        const update = await Order.updateOrderStatus(req.params.id, "Cancelled");
+        const order = await Order.getOrderByOrderId(req.params.id);
+        let items = order.items;
+        items.forEach(async item =>{
+            await Product.restoreStock(item.productId, item.quantity);
+        })
     } catch (error) {
         console.log(error);
         return res.send(error);
