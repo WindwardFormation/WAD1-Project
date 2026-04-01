@@ -34,7 +34,7 @@ exports.postRegister = async (req, res) => {
         req.session.userId = user._id;
         req.session.role = user.role;
 
-        res.redirect('/profile'); 
+        res.redirect('/login'); 
     } catch (err) {
         res.render('register', { error: 'Registration failed. Please try again.' });
     }
@@ -72,7 +72,7 @@ exports.postLogin = async (req, res) => {
 
         return req.session.save(() => {
             if (user.role === 'vendor') {
-                return res.redirect('/vendor/dashboard');
+                return res.redirect('/products/dashboard');
             }
             return res.redirect('/products');
         });
@@ -82,6 +82,8 @@ exports.postLogin = async (req, res) => {
         res.render('login', { error: 'Login failed' });
     }
 };
+
+
 
 exports.postLogout = (req, res) => {
     req.session.destroy(() => {
@@ -134,10 +136,10 @@ exports.postProfile = async (req, res) => {
         res.render('editProfile', { user, error: 'Update failed', session: req.session });
     }
 };
-exports.deleteProfile = async (req, res) => {
-    const { confirmPassword } = req.body;
 
+exports.deleteProfile = async (req, res) => {
     try {
+        const { confirmPassword } = req.body;
         const user = await User.findById(req.session.userId);
 
         if (!user) {
@@ -149,31 +151,28 @@ exports.deleteProfile = async (req, res) => {
         if (!isMatch) {
             return res.render('editProfile', {
                 user,
-                error: 'Incorrect password. Account was not deleted.',
-                session: req.session
+                error: 'Incorrect password',
+                session: req.session,
+                showDelete: true
             });
         }
 
-        const deletedUser = await User.deleteUserById(req.session.userId);
+        const deletedUser = await User.deleteUserById(user._id);
         console.log('Deleted user:', deletedUser);
-        const checkUser = await User.findById(req.session.userId);
-        console.log('🔍 After delete, user exists?:', checkUser);
 
-        req.session.destroy((err) => {
-            if (err) {
-                return res.redirect('/profile');
-            }
-            res.redirect('/register');
+        req.session.destroy(() => {
+            res.redirect('/login');
         });
     } catch (err) {
         console.error(err);
-
-        const user = await User.findById(req.session.userId);
-
+        if (!user) {
+            return res.redirect('/login');
+        }
         res.render('editProfile', {
             user,
-            error: 'Failed to delete account.',
-            session: req.session
+            error: 'Failed to delete account',
+            session: req.session,
+            showDelete: true
         });
     }
 };
