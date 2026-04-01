@@ -125,9 +125,9 @@ exports.editProfile = async (req, res) => {
 };
 
 exports.postProfile = async (req, res) => {
-    const { username, email } = req.body;
+    const { username, email, shippingAddress, region } = req.body;
     try {
-        await User.updateUserById(req.session.userId, { username, email });
+        await User.updateUserById(req.session.userId, { username, email, shippingAddress, region});
         res.redirect('/profile');
     } catch (err) {
         const user = await User.findById(req.session.userId);
