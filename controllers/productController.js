@@ -5,15 +5,16 @@ const Order = require('../models/orderModel');
 // GET /products
 exports.getAllProducts = async (req, res) => {
     try {
-        const { category, search } = req.query;
+        const { category, search } = req.query;        // first load: category & search are undefined since url is empty
         const query = {};
 
         if (category) query.category = category;
         if (search) query.name = { $regex: search, $options: 'i' };
 
-        const products = await productModel.getAllProducts(query);
+        const products = await productModel.getAllProducts(query);         // first load: returns all product
+        const categories = ['Electronics', 'Fashion', 'Home & Living', 'Books']
 
-        res.render('products', {products,category,search,session: req.session});
+        res.render('products', {products,category,search,categories,session: req.session});
     } catch (error) {
         res.send('Failed to load products');
     }
@@ -29,8 +30,9 @@ exports.getVendorDashboard = async (req, res) => {
         if (search) query.name = { $regex: search, $options: 'i' };
 
         const products = await productModel.getVendorProducts(query);
+        const categories = ['Electronics', 'Fashion', 'Home & Living', 'Books']
 
-        res.render('vendorDashboard', {products,category,search,session: req.session,success: null});
+        res.render('vendorDashboard', {products,category,search,categories, session: req.session,success: null});
     } catch (error) {
         res.send('Failed to load dashboard');
     }
