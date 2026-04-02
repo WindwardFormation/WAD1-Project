@@ -23,7 +23,13 @@
     </div>
         <form action="/products" method="GET" class="mb-8 flex justify-center space-x-4">
             <input type="text" name="search" placeholder="Search products" value="<%= search || '' %>" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <input type="text" name="category" placeholder="Category" value="<%= category || '' %>" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <!-- <input type="text" name="category" placeholder="Category" value="<%= category || '' %>" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"> -->
+            <select name="category" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">All Categories</option>
+            <% categories.forEach(cat => { %>
+                <option value="<%= cat %>" <%= category === cat ? 'selected' : '' %>> <%= cat %></option>
+            <% }) %>
+        </select>
             <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Filter</button>
         </form>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
