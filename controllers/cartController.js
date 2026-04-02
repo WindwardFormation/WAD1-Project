@@ -1,4 +1,5 @@
 const Cart = require('../models/cartModel');
+const Product = require('../models/productModel');
 
 exports.getCartPage = async (req, res) => {
     const cartItems = await Cart.getCartItemsByUserId(req.session.userId);
@@ -7,9 +8,15 @@ exports.getCartPage = async (req, res) => {
 
 exports.addToCart = async (req, res) => {
     const { productId, quantity } = req.body;
-
-    await Cart.addOrIncrementItem(req.session.userId, productId, parseInt(quantity));
-    res.redirect('/cart');
+    const stockAmount = await Product.findStocks(productId);
+    if (stockAmount === 0 ) {
+        res.send(`Sorry, this item is out of stock
+            <br>
+            <a href="/products" >Back to product page`);
+    } else {
+        await Cart.addOrIncrementItem(req.session.userId, productId, parseInt(quantity));
+        res.redirect('/cart');
+    }
 };
 
 exports.updateCartItem = async (req, res) => {
