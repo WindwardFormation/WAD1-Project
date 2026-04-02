@@ -1,5 +1,5 @@
 const Cart = require('../models/cartModel');
-const Products = require('../models/productModel');
+const Product = require('../models/productModel');
 
 exports.getCartPage = async (req, res) => {
     const cartItems = await Cart.getCartItemsByUserId(req.session.userId);
