@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
+const Product = require('../models/productModel');
 
 exports.getRegister = (req, res) => {
     res.render('register', { error: null });
@@ -50,7 +51,7 @@ exports.postLogin = async (req, res) => {
     try {
         const user = await User.findByUsername(username);
 
-        // Username does not exist
+        // username dont exist
         if (!user) {
             return res.render('login', {
                 error: 'Username does not exist'
@@ -59,14 +60,14 @@ exports.postLogin = async (req, res) => {
 
         const isMatch = await bcrypt.compare(password, user.passwordHash);
 
-        // Password wrong
+        // wrong password
         if (!isMatch) {
             return res.render('login', {
                 error: 'Incorrect password'
             });
         }
 
-        // Login success
+        // successful login
         req.session.userId = user._id;
         req.session.role = user.role;
 
@@ -127,20 +128,42 @@ exports.editProfile = async (req, res) => {
 };
 
 exports.postProfile = async (req, res) => {
-    const { username, email, shippingAddress, region } = req.body;
+    const {username,email,shippingAddress,region,businessName,storeAddress} = req.body;
     try {
-        await User.updateUserById(req.session.userId, { username, email, shippingAddress, region});
+        const updateData = {
+            username: username?.trim(),
+            email: email?.trim()
+        };
+
+        if (req.session.role === 'customer') {
+            updateData.shippingAddress = shippingAddress?.trim() || '';
+            updateData.region = region?.trim() || '';
+        }
+
+        if (req.session.role === 'vendor') {
+            updateData.businessName = businessName?.trim() || '';
+            updateData.storeAddress = storeAddress?.trim() || '';
+        }
+
+        await User.updateUserById(req.session.userId, updateData);
         res.redirect('/profile');
     } catch (err) {
         const user = await User.findById(req.session.userId);
-        res.render('editProfile', { user, error: 'Update failed', session: req.session });
+        res.render('editProfile', {
+            user,
+            error: 'Update failed',
+            session: req.session,
+            showDelete: false
+        });
     }
 };
 
 exports.deleteProfile = async (req, res) => {
+    let user; // global var cus using in both try and catch
+
     try {
         const { confirmPassword } = req.body;
-        const user = await User.findById(req.session.userId);
+        user = await User.findById(req.session.userId);
 
         if (!user) {
             return res.redirect('/login');
@@ -157,6 +180,22 @@ exports.deleteProfile = async (req, res) => {
             });
         }
 
+        // check for existing product listings
+        if (user.role === 'vendor') {
+            const vendorProducts = await Product.getVendorProducts({
+                vendorId: user._id
+            });
+
+            if (vendorProducts.length > 0) {
+                return res.render('editProfile', {
+                    user,
+                    error: 'Cannot delete vendor account while products are still listed.',
+                    session: req.session,
+                    showDelete: true
+                });
+            }
+        }
+
         const deletedUser = await User.deleteUserById(user._id);
         console.log('Deleted user:', deletedUser);
 
@@ -165,9 +204,11 @@ exports.deleteProfile = async (req, res) => {
         });
     } catch (err) {
         console.error(err);
+
         if (!user) {
             return res.redirect('/login');
         }
+
         res.render('editProfile', {
             user,
             error: 'Failed to delete account',

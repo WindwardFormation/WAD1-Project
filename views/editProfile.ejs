@@ -18,7 +18,7 @@
         </h1>
 
         <% if (error) { %>
-            <p class="text-red-500 mb-4 text-center"><%= error %></p>
+            <p class="text-red-500 mb-4 text-center max-w-xs mx-auto leading-tight"><%= error %></p>
         <% } %>
 
         <form action="/profile" method="POST" class="space-y-4">
@@ -28,7 +28,7 @@
                 <input
                     type="text"
                     name="username"
-                    value="<%= user.username %>"
+                    value="<%= user.username || '' %>"
                     required
                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 >
@@ -39,25 +39,57 @@
                 <input
                     type="email"
                     name="email"
-                    value="<%= user.email %>"
+                    value="<%= user.email || '' %>"
                     required
                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 >
             </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Shipping Address</label>
-                <input type="text" name="shippingAddress" value="<%= user.shippingAddress || '' %>"
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Region</label>
-                <input type="text" name="region" value="<%= user.region || '' %>"
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
-            </div>
 
-            <div class="flex justify-between items-center">
+            <% if (user.role === 'customer') { %>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Shipping Address</label>
+                    <input
+                        type="text"
+                        name="shippingAddress"
+                        value="<%= user.shippingAddress || '' %>"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Region</label>
+                    <input
+                        type="text"
+                        name="region"
+                        value="<%= user.region || '' %>"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                </div>
+            <% } %>
+
+            <% if (user.role === 'vendor') { %>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Business Name</label>
+                    <input
+                        type="text"
+                        name="businessName"
+                        value="<%= user.businessName || '' %>"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Store Address</label>
+                    <input
+                        type="text"
+                        name="storeAddress"
+                        value="<%= user.storeAddress || '' %>"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                </div>
+            <% } %>
+
+            <div class="flex justify-between items-center pt-2">
                 <a href="/profile" class="text-gray-600 hover:text-gray-500 font-medium">
                     Cancel
                 </a>
@@ -72,11 +104,12 @@
         </form>
 
         <div class="mt-8 border-t pt-6">
-
             <% if (!showDelete) { %>
-                <a href="/profile/edit?delete=true"
-                   class="block w-full text-center bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700">
-                   Delete Account
+                <a
+                    href="/profile/edit?delete=true"
+                    class="block w-full text-center bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700"
+                >
+                    Delete Account
                 </a>
             <% } else { %>
                 <h2 class="text-lg font-semibold text-red-600 mb-2">
@@ -87,34 +120,36 @@
                     Please enter your current password to confirm account deletion.
                 </p>
 
-                <form action="/profile/delete" method="POST" class="space-y-4"
-                      onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
-
+                <form
+                    action="/profile/delete"
+                    method="POST"
+                    class="space-y-4"
+                    onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');"
+                >
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Current Password</label>
                         <input
                             type="password"
                             name="confirmPassword"
                             required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
                         >
                     </div>
 
                     <div class="flex justify-between items-center">
-                        <a href="/profile/edit"
-                           class="text-gray-600 hover:text-gray-500 font-medium">
+                        <a href="/profile/edit" class="text-gray-600 hover:text-gray-500 font-medium">
                             Cancel
                         </a>
 
                         <button
                             type="submit"
-                            class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700">
+                            class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700"
+                        >
                             Confirm Delete
                         </button>
                     </div>
                 </form>
             <% } %>
-
         </div>
 
     </div>

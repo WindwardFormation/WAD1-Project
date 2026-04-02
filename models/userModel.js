@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
     role: { type: String, enum: ['customer', 'vendor'], default: 'customer' },
     shippingAddress: {type: String,default: ''},
     region: {type: String,default: ''},
+    businessName: {type: String,default: ''},
+    storeAddress: {type: String,default: ''},
     createdAt: { type: Date, default: Date.now }
 });
 
