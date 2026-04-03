@@ -105,11 +105,13 @@ exports.postAddProduct = async (req, res) => {
         });
 
         const products = await productModel.getVendorProducts({vendorId: req.session.userId});
+        const categories = ['Electronics', 'Fashion', 'Home & Living', 'Books'];
 
         res.render('vendorDashboard', {
             products,
             category: '',
             search: '',
+            categories,
             session: req.session,
             success: `${name} added successfully!`
         });
@@ -214,10 +216,12 @@ exports.postEditProduct = async (req, res) => {
 
 
         const products = await productModel.getVendorProducts({ vendorId: req.session.userId });
+        const categories = ['Electronics', 'Fashion', 'Home & Living', 'Books'];
         res.render('vendorDashboard', {
             products,
             category: '',
             search: '',
+            categories,
             session: req.session,
             success: `${name} updated successfully!`
         });
@@ -242,11 +246,13 @@ exports.deleteProduct = async (req, res) => {
         }
         await productModel.deleteProductById(req.params.id);
         const products = await productModel.getVendorProducts({vendorId: req.session.userId});
+        const categories = ['Electronics', 'Fashion', 'Home & Living', 'Books'];
 
         res.render('vendorDashboard', {
             products,
             category: '',
             search: '',
+            categories,
             session: req.session,
             success: `${product.name} deleted successfully!`
         });
