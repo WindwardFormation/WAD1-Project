@@ -18,7 +18,7 @@ exports.getAllProducts = function(query = {}) {
     return Product.find(query).populate('vendorId', 'username');
 };
 
-// Get vendor products
+// Get products(s) by vendor ID
 exports.getVendorProducts = function(query = {}) {
     return Product.find(query);
 };
@@ -28,7 +28,7 @@ exports.getProductById = function(productId) {
     return Product.findById(productId);
 };
 
-// Get product by ID with vendor
+// Get product + vendor details by product ID
 exports.getProductByIdWithVendor = function(productId) {
     return Product.findById(productId).populate('vendorId', 'username');
 };

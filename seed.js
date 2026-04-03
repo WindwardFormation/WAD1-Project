@@ -175,35 +175,40 @@ async function seedDB() {
                 productId: products[0]._id,
                 orderId: orders[0]._id,
                 rating: 5,
-                comment: 'Excellent laptop, very fast and reliable!'
+                comment: 'Excellent laptop, very fast and reliable!',
+                username: users[2].username
             },
             {
                 userId: users[3]._id,
                 productId: products[1]._id,
                 orderId: orders[1]._id,
                 rating: 4,
-                comment: 'Good book, enjoyed reading it.'
+                comment: 'Good book, enjoyed reading it.',
+                username: users[3].username
             },
             {
                 userId: users[2]._id,
                 productId: products[2]._id,
                 orderId: orders[1]._id,
                 rating: 4,
-                comment: 'Comfortable shoes, good for running.'
+                comment: 'Comfortable shoes, good for running.',
+                username: users[2].username
             },
             {
                 userId: users[3]._id,
                 productId: products[3]._id,
                 orderId: orders[2]._id,
                 rating: 5,
-                comment: 'Amazing phone, camera is superb.'
+                comment: 'Amazing phone, camera is superb.',
+                username: users[3].username
             },
             {
                 userId: users[2]._id,
                 productId: products[4]._id,
                 orderId: orders[0]._id,
                 rating: 3,
-                comment: 'Good sound quality, but battery life could be better.'
+                comment: 'Good sound quality, but battery life could be better.',
+                username: users[2].username
             }
         ]);
         console.log('Reviews created');

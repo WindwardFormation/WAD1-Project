@@ -1,8 +1,9 @@
 const Review = require('../models/reviewModel');
 const Order = require('../models/orderModel');
 const Product = require('../models/productModel');
+const User = require('../models/userModel');
 
-// POST /reviews/add
+
 exports.addReview = async (req, res) =>  {
     const productId = req.body.productId;
     const rating = parseInt(req.body.rating);
@@ -49,12 +50,16 @@ exports.addReview = async (req, res) =>  {
             return res.redirect(`/products/${productId}?message=already_reviewed`);
         }
 
+        // fetch logged in user to store username for that review  
+        const reviewer = await User.findById(req.session.userId);   
+
         let newReview = {
             userId: req.session.userId,
             productId: productId,
             orderId: availableOrder._id,
             rating: parseInt(rating),
-            comment: comment
+            comment: comment,
+            username: reviewer.username
         };
 
         await Review.createReview(newReview); 
@@ -67,7 +72,7 @@ exports.addReview = async (req, res) =>  {
     }
 };
 
-// POST /reviews/update/:id
+
 exports.updateReview = async (req, res) => {
     const productId = req.body.productId;
     const reviewId = req.params.id;
@@ -115,7 +120,7 @@ exports.updateReview = async (req, res) => {
     }
 };
 
-// POST /reviews/delete/:id
+
 exports.deleteReview = async (req, res) => {
     const reviewId = req.params.id;
     try {
@@ -152,24 +157,25 @@ exports.getReviewPage = async (req, res) => {
         const orders = await Order.getOrdersByUserId(req.session.userId);
         const reviews = await Review.getReviewsByUser(req.session.userId);
 
-        const toReviewItems = [];
-        const historyItems = [];
+        const toReviewItems = []; 
+        const historyItems = []; 
 
         const reviewLookup = {};
 
         for (let i = 0; i < reviews.length; i++) {
             const review = reviews[i];
+            // set key as orderId and productId to identify which product from which order is reviewed
             const key = review.orderId.toString() + '_' + review.productId.toString();
             reviewLookup[key] = review;
         }
 
         for (let i = 0; i < orders.length; i++) {
             const order = orders[i];
-
+            
             if (!order || order.status !== 'Completed') {
                 continue;
             }
-
+            // loop through every item in the order
             for (let j = 0; j < order.items.length; j++) {
                 const item = order.items[j];
 
@@ -182,10 +188,10 @@ exports.getReviewPage = async (req, res) => {
                 if (!product || !product.vendorId) {
                     continue;
                 }
-
+                // to check if this key exists in reviewLookup
                 const key = order._id.toString() + '_' + product._id.toString();
                 const existingReview = reviewLookup[key];
-
+                
                 if (existingReview) {
                     historyItems.push({
                         productId: product._id,
