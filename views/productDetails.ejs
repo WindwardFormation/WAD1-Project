@@ -94,7 +94,7 @@
                 <% } else { %>
                     <% reviews.forEach(review => { %>
                         <div class="bg-gray-50 p-4 rounded-md mb-4">
-                            <p class="font-semibold"><%= review.userId.username %> - <span class="text-yellow-500"><%= '★'.repeat(review.rating) %></span> (<%= review.rating %>/5)</p>
+                            <p class="font-semibold"><%= review.username%> - <span class="text-yellow-500"><%= '★'.repeat(review.rating) %></span> (<%= review.rating %>/5)</p>
                             <p class="text-gray-700"><%= review.comment %></p>
                             <br>
                             <p class="text-sm text-gray-500">
@@ -102,7 +102,8 @@
                             </p>
                             <br>
                             
-                            <% if (session.userId && review.userId._id.toString() === session.userId) { %>
+                            <!--check if user is logged in and if review belongs to user-->
+                            <% if (session.userId && review.userId && review.userId.toString() === session.userId) { %>
                                 <div class="mt-2 space-x-2">
                                     
                                     <form action="/reviews/update/<%= review._id %>" method="POST" class="inline">
